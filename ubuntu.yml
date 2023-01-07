@@ -6,12 +6,10 @@
   vars:
     so_user: 
     vpn_user:
-    vpn_url:
     ramal: 
     repo_url:
     repo_user: 
     repo_pass: 
-    erp_url:
   tasks:
     - name: Garantindo instalação de pacotes básicos do linux
       package:
@@ -93,6 +91,12 @@
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
         when: not sankhya.stat.exists
+      - name: Tentando baixar o Sankhya webclient.db
+        get_url:
+          url: 'https://{{ repo_url }}/webclient.db'
+          dest: '/home/{{ so_user }}/Downloads/webclient.db'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
       - name: Tentando extrair tar.gz do Sankhya
         unarchive:
           src: '/home/{{ so_user }}/Downloads/sankhya.tar.gz'
@@ -115,8 +119,8 @@
           group: '{{ so_user }}'
           state: directory
       - name: Garantido que exista arquivo de configuração do Sankhya
-        template:
-          src: files/webclient.db.j2
+        copy:
+          src: '/home/{{ so_user }}/Downloads/webclient.db'
           dest: '/home/{{ so_user }}/.config/Navegador/Sankhya/db/webclient.db'
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
@@ -169,9 +173,15 @@
           group: '{{ so_user }}'
           state: directory
           mode: '0755'
+      - name: Tentando baixar o GlobalProtect pangpa.xml.j2
+        get_url:
+          url: 'https://{{ repo_url }}/pangpa.xml.j2'
+          dest: '/home/{{ so_user }}/Downloads/pangpa.xml.j2'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
       - name: Garantindo configuração do GlobalProtect
         template:
-          src: files/pangpa.xml.j2
+          src: '/home/{{ so_user }}/Downloads/pangpa.xml.j2'
           dest: '/home/{{ so_user }}/.GlobalProtect/pangpa.xml'
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
@@ -186,6 +196,12 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0775'
+      - name: Reiniciando GlobalProtect
+        shell: |
+          killall -9 PanGPS
+          killall -9 PanGPUI
+        args:
+          warn: false
     - block:
       - name: Verificando se existe instalador para o Teamviewer
         stat:
@@ -202,8 +218,19 @@
         apt:
           deb: '/home/{{ so_user }}/Downloads/teamviewer.deb'
     - block:
+      - name: Verificando se o RPORT está instalado
+        stat:
+          path: /usr/local/bin/rport
+        register: rport
+      - name: Tentando baixar o RPORT
+        get_url:
+          url: 'https://{{ repo_url }}/rport.sh'
+          dest: '/home/{{ so_user }}/Downloads/rport.sh'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not rport.stat.exists
       - name: Tentando instalar o RPORT
-        shell: |
-          curl https://pairing.rport.io/ZzH2Vz8 > /tmp/rport-installer.sh
-          sh /tmp/rport-installer.sh -x -s -r -b -i
-        warn: false
+        shell: 'sh /home/{{ so_user }}/Downloads/rport.sh -x -s -r -b -i'
+        args:
+          warn: false
+        when: not rport.stat.exists
