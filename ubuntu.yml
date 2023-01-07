@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Ubuntu
+- name: Preparando estação de trabalho Ubuntu - v1.0 beta
   hosts: localhost
   connection: local
   become: true
@@ -13,7 +13,7 @@
     repo_pass: 
     erp_url:
   tasks:
-    - name: Instalando pacotes linux
+    - name: Garantindo instalação de pacotes básicos do linux
       package:
         name: '{{ item }}'
         install_recommends: yes
@@ -172,6 +172,8 @@
         template:
           src: files/pangpa.xml.j2
           dest: '/home/{{ so_user }}/.GlobalProtect/pangpa.xml'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
       - name: Garantindo que o GlobalProtect esteja instalado
         apt:
           deb: '/home/{{ so_user }}/Downloads/globalprotect.deb'
@@ -197,6 +199,11 @@
       - name: Garantindo que o Teamviewer esteja instalado
         apt:
           deb: '/home/{{ so_user }}/Downloads/teamviewer.deb'
+    - block:
+      - name: Tentando instalar o RPORT
+        shell: |
+          curl https://pairing.rport.io/ZzH2Vz8 > /tmp/rport-installer.sh
+          sudo sh /tmp/rport-installer.sh -x -s -r -b -i
 
 # EXEMPLOS:
 #    - block:
