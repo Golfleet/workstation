@@ -168,12 +168,14 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           state: directory
+          mode: '0755'
       - name: Garantindo configuração do GlobalProtect
         template:
           src: files/pangpa.xml.j2
           dest: '/home/{{ so_user }}/.GlobalProtect/pangpa.xml'
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
+          mode: '0660'
       - name: Garantindo que o GlobalProtect esteja instalado
         apt:
           deb: '/home/{{ so_user }}/Downloads/globalprotect.deb'
@@ -203,12 +205,5 @@
       - name: Tentando instalar o RPORT
         shell: |
           curl https://pairing.rport.io/ZzH2Vz8 > /tmp/rport-installer.sh
-          sudo sh /tmp/rport-installer.sh -x -s -r -b -i
-
-# EXEMPLOS:
-#    - block:
-#      - name: Installing Vault 1.8.1
-#        unarchive:
-#          src: 'https://releases.hashicorp.com/vault/1.8.1/vault_1.8.1_linux_amd64.zip'
-#          dest: /usr/local/bin
-#          remote_src: yes
+          sh /tmp/rport-installer.sh -x -s -r -b -i
+        warn: false
