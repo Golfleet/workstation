@@ -23,6 +23,7 @@
           - wget
           - ncdu
           - tree
+          - libgtk2.0-0:i386
     - block:
       - name: Garantindo que a chave para o repositório Google esteja presente
         apt_key: 
