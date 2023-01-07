@@ -172,9 +172,6 @@
           dest: '/home/{{ so_user }}/Downloads/pangpa.xml.j2'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
-      - name: Garantindo que o GlobalProtect esteja instalado
-        apt:
-          deb: '/home/{{ so_user }}/Downloads/globalprotect.deb'
       - name: Garantindo que exista o diretório config do GlobalProtect
         file:
           path: '/home/{{ so_user }}/.GlobalProtect'
@@ -189,6 +186,9 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0660'
+      - name: Garantindo que o GlobalProtect esteja instalado
+        apt:
+          deb: '/home/{{ so_user }}/Downloads/globalprotect.deb'
       - name: Garantido que exista atalho para o GlobalProtect
         copy:
           src: /usr/share/applications/globalprotect.desktop
