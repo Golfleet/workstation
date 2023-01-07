@@ -1,0 +1,207 @@
+---
+- name: Preparando estação de trabalho Ubuntu
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+    so_user: 
+    vpn_user:
+    vpn_url:
+    ramal: 
+    repo_url:
+    repo_user: 
+    repo_pass: 
+    erp_url:
+  tasks:
+    - name: Instalando pacotes linux
+      package:
+        name: '{{ item }}'
+        install_recommends: yes
+        state: present
+      loop:
+          - vim
+          - htop
+          - curl
+          - wget
+          - ncdu
+          - tree
+    - block:
+      - name: Garantindo que a chave para o repositório Google esteja presente
+        apt_key: 
+          url: 'https://dl.google.com/linux/linux_signing_key.pub'
+          state: present
+      - name: Garantindo que o repositório do Google esteja presente
+        apt_repository:
+          repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
+          state: present
+          filename: google-chrome
+      - name: Garantindo que o navegador Google Chrome esteja instalado
+        apt:
+          name: google-chrome-stable
+      - name: Garantido que exista atalho para o Google Chrome
+        copy:
+          src: /usr/share/applications/google-chrome.desktop
+          dest: '/home/{{ so_user }}/Área de Trabalho/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
+    - block:
+      - name: Verificando se existe instalador para o Zoiper
+        stat:
+          path: '/home/{{ so_user }}/Downloads/zoiper.deb'
+        register: zoiper
+      - name: Tentando baixar o Zoiper
+        get_url:
+          url: 'https://{{ repo_url }}/zoiper.deb'
+          dest: '/home/{{ so_user }}/Downloads/zoiper.deb'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not zoiper.stat.exists
+      - name: Garantindo que o Zoiper esteja instalado
+        apt:
+          deb: '/home/{{ so_user }}/Downloads/zoiper.deb'
+      - name: Garantindo que exista o diretório de config Zoiper
+        file:
+          path: '/home/{{ so_user }}/.Zoiper5'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          state: directory
+      - name: Garantindo configuração do Zoiper
+        template:
+          src: files/Config.xml.j2
+          dest: '/home/{{ so_user }}/.Zoiper5/Config.xml'
+      - name: Garantido que exista atalho para o Zoiper
+        copy:
+          src: /usr/share/applications/Zoiper5.desktop
+          dest: '/home/{{ so_user }}/Área de Trabalho/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
+    - block:
+      - name: Verificando se existe instalador para o Sankhya
+        stat:
+          path: '/home/{{ so_user }}/Downloads/sankhya.tar.gz'
+        register: sankhya
+      - name: Verificando se o Sankhya já está instalado
+        stat:
+          path: '/home/{{ so_user }}/Sankhya'
+        register: sankhya_installed
+      - name: Tentando baixar o Sankhya 
+        get_url:
+          url: 'https://{{ repo_url }}/sankhya.tar.gz'
+          dest: '/home/{{ so_user }}/Downloads/sankhya.tar.gz'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not sankhya.stat.exists
+      - name: Tentando extrair tar.gz do Sankhya
+        unarchive:
+          src: '/home/{{ so_user }}/Downloads/sankhya.tar.gz'
+          dest: '/home/{{ so_user }}'
+        when: not sankhya_installed.stat.exists
+      - name: Renomeando diretório do Sankhya
+        shell: 'mv /home/{{ so_user }}/*Sankhya* /home/{{ so_user }}/Sankhya'
+        when: not sankhya_installed.stat.exists
+      - name: Garantindo owner do diretório Sankhya
+        file:
+          path: '/home/{{ so_user }}/Sankhya'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          state: directory
+          recurse: yes
+      - name: Garantindo que exista o diretório DB Sankhya
+        file:
+          path: '/home/{{ so_user }}/.config/Navegador/Sankhya/db/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          state: directory
+      - name: Garantido que exista arquivo de configuração do Sankhya
+        template:
+          src: files/webclient.db.j2
+          dest: '/home/{{ so_user }}/.config/Navegador/Sankhya/db/webclient.db'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0664'
+      - name: Garantido que exista atalho para o Sankhya
+        template:
+          src: files/Sankhya.desktop.j2
+          dest: '/home/{{ so_user }}/Área de Trabalho/Sankhya.desktop'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
+    - block:
+      - name: Verificando se existe instalador para o Discord
+        stat:
+          path: '/home/{{ so_user }}/Downloads/discord.deb'
+        register: discord
+      - name: Tentando baixar o Discord
+        get_url:
+          url: 'https://{{ repo_url }}/discord.deb'
+          dest: '/home/{{ so_user }}/Downloads/discord.deb'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not discord.stat.exists
+      - name: Garantindo que o Discord esteja instalado
+        apt:
+          deb: '/home/{{ so_user }}/Downloads/discord.deb'
+      - name: Garantido que exista atalho para o Discord
+        copy:
+          src: /usr/share/applications/discord.desktop
+          dest: '/home/{{ so_user }}/Área de Trabalho/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
+    - block:
+      - name: Verificando se existe instalador para o GlobalProtect
+        stat:
+          path: '/home/{{ so_user }}/Downloads/globalprotect.deb'
+        register: globalprotect
+      - name: Tentando baixar o GlobalProtect
+        get_url:
+          url: 'https://{{ repo_url }}/globalprotect.deb'
+          dest: '/home/{{ so_user }}/Downloads/globalprotect.deb'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not globalprotect.stat.exists
+      - name: Garantindo que exista o diretório config do GlobalProtect
+        file:
+          path: '/home/{{ so_user }}/.GlobalProtect'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          state: directory
+      - name: Garantindo configuração do GlobalProtect
+        template:
+          src: files/pangpa.xml.j2
+          dest: '/home/{{ so_user }}/.GlobalProtect/pangpa.xml'
+      - name: Garantindo que o GlobalProtect esteja instalado
+        apt:
+          deb: '/home/{{ so_user }}/Downloads/globalprotect.deb'
+      - name: Garantido que exista atalho para o GlobalProtect
+        copy:
+          src: /usr/share/applications/globalprotect.desktop
+          dest: '/home/{{ so_user }}/Área de Trabalho/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
+    - block:
+      - name: Verificando se existe instalador para o Teamviewer
+        stat:
+          path: '/home/{{ so_user }}/Downloads/teamviewer.deb'
+        register: teamviewer
+      - name: Tentando baixar o Teamviewer
+        get_url:
+          url: 'https://download.teamviewer.com/download/linux/teamviewer_amd64.deb'
+          dest: '/home/{{ so_user }}/Downloads/teamviewer.deb'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not teamviewer.stat.exists
+      - name: Garantindo que o Teamviewer esteja instalado
+        apt:
+          deb: '/home/{{ so_user }}/Downloads/teamviewer.deb'
+
+# EXEMPLOS:
+#    - block:
+#      - name: Installing Vault 1.8.1
+#        unarchive:
+#          src: 'https://releases.hashicorp.com/vault/1.8.1/vault_1.8.1_linux_amd64.zip'
+#          dest: /usr/local/bin
+#          remote_src: yes
