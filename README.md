@@ -14,12 +14,12 @@ sudo apt update && sudo apt install ansible unzip git -y
 ```
 2. Clone esse repositório
 ```bash
-git clone https://github.com/Vassilij1/workstation.git
+git clone https://github.com/asf-git/workstation.git
 ```
 
 3. Execute o script ansible
 ```bash
-ansible-playbook workstation/ubuntu.yml --ask-become-pass
+ansible-playbook workstation/ubuntu.yml -K
 ```
 > Digite sua senha quando for solicitado, alguns processos exigem acesso root.
 ___
