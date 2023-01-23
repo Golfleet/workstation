@@ -189,8 +189,9 @@
           group: '{{ so_user }}'
           mode: '0660'
       - name: Garantindo que o GlobalProtect esteja instalado
-        apt:
-          deb: '/home/{{ so_user }}/Downloads/globalprotect.deb'
+        shell: 'dpkg -i /home/{{ so_user }}/Downloads/globalprotect.deb'
+        #apt:
+          #deb: '/home/{{ so_user }}/Downloads/globalprotect.deb'
       - name: Garantido que exista atalho para o GlobalProtect
         copy:
           src: /usr/share/applications/globalprotect.desktop
