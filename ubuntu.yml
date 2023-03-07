@@ -26,6 +26,7 @@
           - libgtk2.0-0:i386
           - libqt5webkit5
           - vlc
+          - flameshot
     - block:
       - name: Garantindo que a chave para o repositório Google esteja presente
         apt_key: 
