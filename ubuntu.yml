@@ -233,7 +233,7 @@
         args:
           warn: false
         when: not rport.stat.exists
-     - block:
+    - block:
       - name: Garantindo configuração de memória swap
         lineinfile:
           path: /etc/sysctl.conf
