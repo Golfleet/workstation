@@ -232,3 +232,10 @@
         args:
           warn: false
         when: not rport.stat.exists
+     - block:
+      - name: Garantindo configuração de memória swap
+        lineinfile:
+          path: /etc/sysctl.conf
+          line: "vm.swappiness = 10"
+          state: present
+
