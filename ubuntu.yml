@@ -48,38 +48,6 @@
           group: '{{ so_user }}'
           mode: '0775'
     - block:
-      - name: Verificando se existe instalador para o Zoiper
-        stat:
-          path: '/home/{{ so_user }}/Downloads/zoiper.deb'
-        register: zoiper
-      - name: Tentando baixar o Zoiper
-        get_url:
-          url: 'https://{{ repo_url }}/zoiper.deb'
-          dest: '/home/{{ so_user }}/Downloads/zoiper.deb'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
-        when: not zoiper.stat.exists
-      - name: Garantindo que o Zoiper esteja instalado
-        apt:
-          deb: '/home/{{ so_user }}/Downloads/zoiper.deb'
-      - name: Garantindo que exista o diretório de config Zoiper
-        file:
-          path: '/home/{{ so_user }}/.Zoiper5'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-          state: directory
-      - name: Garantindo configuração do Zoiper
-        template:
-          src: files/Config.xml.j2
-          dest: '/home/{{ so_user }}/.Zoiper5/Config.xml'
-      - name: Garantido que exista atalho para o Zoiper
-        copy:
-          src: /usr/share/applications/Zoiper5.desktop
-          dest: '/home/{{ so_user }}/Área de Trabalho/'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-          mode: '0775'
-    - block:
       - name: Verificando se existe instalador para o Sankhya
         stat:
           path: '/home/{{ so_user }}/Downloads/sankhya.tar.gz'
@@ -239,4 +207,3 @@
           path: /etc/sysctl.conf
           line: "vm.swappiness = 10"
           state: present
-
