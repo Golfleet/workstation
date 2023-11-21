@@ -19,12 +19,8 @@
           - htop
           - curl
           - wget
-          - ncdu
-          - tree
           - libgtk2.0-0:i386
           - libqt5webkit5
-          - vlc
-          - flameshot
     - block:
       - name: Verificando se o RPORT está instalado
         stat:
