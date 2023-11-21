@@ -1,12 +1,11 @@
 ---
-- name: Preparando estação de trabalho Ubuntu - v1.0 beta
+- name: Preparando estação de trabalho Ubuntu - v1.0
   hosts: localhost
   connection: local
   become: true
   vars:
     so_user: 
     vpn_user:
-    ramal: 
     repo_url:
     repo_user: 
     repo_pass: 
@@ -185,6 +184,21 @@
         apt:
           deb: '/home/{{ so_user }}/Downloads/teamviewer.deb'
     - block:
+      - name: Verificando se existe instalador para o Anydesk
+        stat:
+          path: '/home/{{ so_user }}/Downloads/anydesk.deb'
+        register: anydesk
+      - name: Tentando baixar o Anydesk
+        get_url:
+          url: 'https://{{ repo_url }}/anydesk.sh'
+          dest: '/home/{{ so_user }}/Downloads/anydesk.deb'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not anydesk.stat.exists
+      - name: Garantindo que o Anydesk esteja instalado
+        apt:
+          deb: '/home/{{ so_user }}/Downloads/anydesk.deb'
+    - block:
       - name: Verificando se o RPORT está instalado
         stat:
           path: /usr/local/bin/rport
@@ -205,5 +219,5 @@
       - name: Garantindo configuração de memória swap
         lineinfile:
           path: /etc/sysctl.conf
-          line: "vm.swappiness = 10"
+          line: "vm.swappiness = 0"
           state: present
