@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Ubuntu - v1.0
+- name: Preparando estação de trabalho Ubuntu - v1.1
   hosts: localhost
   connection: local
   become: true
