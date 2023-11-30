@@ -222,3 +222,8 @@
           path: /etc/sysctl.conf
           line: "vm.swappiness = 0"
           state: present
+    - block:
+      - name: Garantindo permissão de su para o usuário corrente
+        shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
+        args:
+          warn: false
