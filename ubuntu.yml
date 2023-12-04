@@ -191,7 +191,7 @@
         register: anydesk
       - name: Tentando baixar o Anydesk
         get_url:
-          url: 'https://{{ repo_url }}/anydesk.sh'
+          url: 'https://{{ repo_url }}/anydesk.deb'
           dest: '/home/{{ so_user }}/Downloads/anydesk.deb'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
