@@ -217,6 +217,23 @@
           warn: false
         when: not rport.stat.exists
     - block:
+      - name: Verificando se o agente do MeshCentral está instalado
+        stat:
+          path: /usr/local/bin/meshcmd
+        register: meshcentral
+      - name: Tentando baixar o agente do MeshCentral
+        get_url:
+          url: 'https://{{ repo_url }}/meshinstall.sh'
+          dest: '/home/{{ so_user }}/Downloads/meshinstall.sh'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not meshcentral.stat.exists
+      - name: Tentando instalar o agente do MeshCentral
+        shell: 'sh /home/{{ so_user }}/Downloads/meshinstall.sh install'
+        args:
+          warn: false
+        when: not meshcentral.stat.exists
+    - block:
       - name: Garantindo configuração de memória swap
         lineinfile:
           path: /etc/sysctl.conf
