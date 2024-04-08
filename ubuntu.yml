@@ -219,7 +219,7 @@
     - block:
       - name: Verificando se o agente do MeshCentral está instalado
         stat:
-          path: /usr/local/bin/meshcmd
+          path: /usr/local/mesh_services/meshagent
         register: meshcentral
       - name: Tentando baixar o agente do MeshCentral
         get_url:
@@ -228,8 +228,14 @@
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
         when: not meshcentral.stat.exists
+      - name: Garantindo que o meshinstall.sh possa ser executado
+        file:
+          path: '/home/{{ so_user }}/Downloads/meshinstall.sh'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0755'
       - name: Tentando instalar o agente do MeshCentral
-        shell: 'sh /home/{{ so_user }}/Downloads/meshinstall.sh install'
+        shell: 'sudo -E /home/{{ so_user }}/Downloads/meshinstall.sh install'
         args:
           warn: false
         when: not meshcentral.stat.exists
