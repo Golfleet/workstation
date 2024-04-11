@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Ubuntu - v1.1
+- name: Preparando estação de trabalho Ubuntu - v1.4
   hosts: localhost
   connection: local
   become: true
@@ -10,6 +10,21 @@
     repo_user: 
     repo_pass: 
   tasks:
+    - block:
+      - name: Verificando se existe instalador para o repositório do zabbix-agent2
+        stat:
+          path: '/home/{{ so_user }}/Downloads/zabbix-agent2.deb'
+        register: zabbixagent2
+      - name: Tentando baixar o instalador de repositório do zabbix-agent2 
+        get_url:
+          url: 'https://repo.zabbix.com/zabbix/6.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu20.04_all.deb'
+          dest: '/home/{{ so_user }}/Downloads/zabbix-agent2.deb'
+        when: not zabbixagent2.stat.exists
+      - name: Garantindo que o repositório do zabbix-agent2 esteja instalado
+        shell: 'dpkg -i /home/{{ so_user }}/Downloads/zabbix-agent2.deb'
+      - name: Atualizando repositórios
+        apt:
+          update_cache: yes
     - name: Garantindo instalação de pacotes básicos do linux
       package:
         name: '{{ item }}'
@@ -27,6 +42,25 @@
           - vlc
           - flameshot
           - gdebi
+          - zabbix-agent2
+    - block:
+      - name: Tentando baixar o config do zabbix-agent2
+        get_url:
+          url: 'https://{{ repo_url }}/zabbix/zabbix_agent2.conf'
+          dest: '/etc/zabbix/zabbix_agent2.conf'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+      - name: Tentando baixar o key.psk do zabbix-agent2
+        get_url:
+          url: 'https://{{ repo_url }}/zabbix/key.psk'
+          dest: '/etc/zabbix/key.psk'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+      - name: Reiniciando e habilitando o serviço do zabbix-agent2
+        service:
+          name: zabbix-agent2
+          state: restarted
+          enabled: yes
     - block:
       - name: Garantindo que a chave para o repositório Google esteja presente
         apt_key: 
