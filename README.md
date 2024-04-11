@@ -3,7 +3,7 @@
 Esse repositório contem scripts ansible e jinja2 para automatizar o processo de instalação de workstations.
 
 > **_Observação_** :  
-> Testado em Ubuntu 22.04 LTS
+> Testado em ZorinOS 16 (Ubuntu 20.04 LTS)
 ___
 
 ## Instalação
