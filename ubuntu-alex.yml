@@ -60,6 +60,7 @@
         - discord
         - zoom-client
         - obsidian --classic
+        - bitwarden
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
