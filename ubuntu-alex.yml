@@ -5,8 +5,8 @@
   become: true
   vars:
     so_user: 
-    vpn_user:
-    repo_url:
+    vpn_user: 
+    repo_url: 
     repo_user: 
     repo_pass: 
   tasks:
@@ -17,7 +17,7 @@
         register: zabbixagent2
       - name: Tentando baixar o instalador de repositório do zabbix-agent2 
         get_url:
-          url: 'https://repo.zabbix.com/zabbix/6.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu20.04_all.deb'
+          url: 'https://repo.zabbix.com/zabbix/6.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu22.04_all.deb'
           dest: '/home/{{ so_user }}/Downloads/zabbix-agent2.deb'
         when: not zabbixagent2.stat.exists
       - name: Garantindo que o repositório do zabbix-agent2 esteja instalado
@@ -38,9 +38,10 @@
           - tree
           - libgtk2.0-0:i386
           - libqt5webkit5
+          - libwebkit2gtk-4.1-0
+          - gnome-keyring
           - vlc
           - flameshot
-          - gdebi
           - zabbix-agent2
           - kazam
           - peek
@@ -60,7 +61,6 @@
         - discord
         - zoom-client
         - obsidian --classic
-        - bitwarden
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
@@ -94,14 +94,7 @@
           name: google-chrome-stable
     - block:
       - name: Garantindo que a chave para o repositório Lens Desktop esteja presente
-        get_url:
-          url: https://downloads.k8slens.dev/keys/gpg
-          dest: /tmp/lens-archive-keyring.gpg
-          mode: 0644
-      - name: Importando o Lens archive keyring
-        apt_key:
-          keyring: /tmp/lens-archive-keyring.gpg
-          state: present
+        shell: 'curl -fsSL https://downloads.k8slens.dev/keys/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/lens-archive-keyring.gpg > /dev/null'
       - name: Garantindo que o repositório do Lens esteja presente
         apt_repository:
           repo: 'deb [arch=amd64 signed-by=/usr/share/keyrings/lens-archive-keyring.gpg] https://downloads.k8slens.dev/apt/debian stable main'
@@ -118,11 +111,11 @@
           mode: 0644
       - name: Importando o Brave archive keyring
         apt_key:
-          keyring: /tmp/brave-browser-archive-keyring.gpg
+          file: /tmp/brave-browser-archive-keyring.gpg
           state: present
       - name: Garantindo que o repositório do Brave esteja presente
         apt_repository:
-          repo: 'deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main'
+          repo: 'deb [signed-by=/tmp/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main'
           state: present
           filename: brave-browser-release.list
       - name: Garantindo que o Brave esteja instalado
@@ -136,11 +129,11 @@
           mode: 0644
       - name: Importando o OpenVPN archive keyring
         apt_key:
-          keyring: /tmp/openvpn.asc
+          file: /tmp/openvpn.asc
           state: present
       - name: Garantindo que o repositório do Brave esteja presente
         apt_repository:
-          repo: 'deb [signed-by=/etc/apt/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main'
+          repo: 'deb [signed-by=/tmp/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main'
           state: present
           filename: openvpn-packages.list
       - name: Garantindo que o OpenVPN esteja instalado
