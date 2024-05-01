@@ -128,6 +128,24 @@
         apt:
           name: brave-browser
     - block:
+      - name: Garantindo que a chave para o repositório OpenVPN esteja presente
+        get_url:
+          url: https://packages.openvpn.net/packages-repo.gpg
+          dest: /tmp/openvpn.asc
+          mode: 0644
+      - name: Importando o OpenVPN archive keyring
+        apt_key:
+          keyring: /tmp/openvpn.asc
+          state: present
+      - name: Garantindo que o repositório do Brave esteja presente
+        apt_repository:
+          repo: 'deb [signed-by=/etc/apt/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main'
+          state: present
+          filename: openvpn-packages.list
+      - name: Garantindo que o OpenVPN esteja instalado
+        apt:
+          name: openvpn3
+    - block:
       - name: Verificando se existe instalador para o RDM
         stat:
           path: '/home/{{ so_user }}/Downloads/RDM.deb'
