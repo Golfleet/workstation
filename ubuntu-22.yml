@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Ubuntu 24 Infra - v1.0
+- name: Preparando estação de trabalho Ubuntu 22 Infra - v1.0
   hosts: localhost
   connection: local
   become: true
@@ -46,6 +46,8 @@
           - wireshark
           - virtualbox
           - tilix
+          - kazam
+          - peek
     - name: Garantindo instalação de pacotes via snap
       command: snap install {{ item }}
       loop:
@@ -92,7 +94,7 @@
       - name: Garantindo que a chave para o repositório Brave esteja presente
         get_url:
           url: https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-          dest: /tmp/brave-browser-archive-keyring.gpg
+          dest: /usr/share/keyrings/brave-browser-archive-keyring.gpg
           mode: 0644
       - name: Importando o Brave archive keyring
         apt_key:
@@ -102,7 +104,7 @@
         apt_repository:
           repo: 'deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main'
           state: present
-          filename: brave-browser-release.list
+          filename: brave-browser-release
       - name: Garantindo que o Brave esteja instalado
         apt:
           name: brave-browser
@@ -116,11 +118,11 @@
         apt_key:
           file: /usr/share/keyrings/openvpn.asc
           state: present
-      - name: Garantindo que o repositório do Brave esteja presente
+      - name: Garantindo que o repositório do OpenVPN esteja presente
         apt_repository:
           repo: 'deb [signed-by=/usr/share/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main'
           state: present
-          filename: openvpn-packages.list
+          filename: openvpn-packages
       - name: Garantindo que o OpenVPN esteja instalado
         apt:
           name: openvpn3
