@@ -48,17 +48,6 @@
           - tilix
           - kazam
           - peek
-    - name: Garantindo instalação de pacotes via snap
-      command: snap install {{ item }}
-      loop:
-        - postman
-        - spotify
-        - sublime-text --classic
-        - code --classic
-        - discord
-        - zoom-client
-        - obsidian --classic
-        - kontena-lens --classic
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
@@ -77,6 +66,20 @@
           name: zabbix-agent2
           state: restarted
           enabled: yes
+    - block:
+      - name: Verificando se existe instalador para o GlobalProtect
+        stat:
+          path: '/home/{{ so_user }}/Downloads/globalprotect.deb'
+        register: globalprotect
+      - name: Tentando baixar o GlobalProtect
+        get_url:
+          url: 'https://{{ repo_url }}/globalprotect.deb'
+          dest: '/home/{{ so_user }}/Downloads/globalprotect.deb'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not globalprotect.stat.exists
+      - name: Garantindo que o GlobalProtect esteja instalado
+        shell: 'dpkg -i /home/{{ so_user }}/Downloads/globalprotect.deb'
     - block:
       - name: Garantindo que a chave para o repositório Google esteja presente
         apt_key: 
@@ -172,3 +175,14 @@
         shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
         args:
           warn: false
+    - name: Garantindo instalação de pacotes via snap
+      command: snap install {{ item }}
+      loop:
+        - postman
+        - spotify
+        - sublime-text --classic
+        - code --classic
+        - discord
+        - zoom-client
+        - obsidian --classic
+        - kontena-lens --classic
