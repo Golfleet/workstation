@@ -48,6 +48,9 @@
           - tilix
           - kazam
           - peek
+          - fuse
+          - libfuse2
+          - gdebi
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
