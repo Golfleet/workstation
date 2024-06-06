@@ -1,11 +1,10 @@
 ---
-- name: Preparando estação de trabalho KDE Neon 6 (Ubuntu 22.04 based) Infra - v1.0
+- name: Preparando estação de trabalho POP_OS! 22.04 - v1.0
   hosts: localhost
   connection: local
   become: true
   vars:
     so_user: 
-    vpn_user: 
     repo_url: 
     repo_user: 
     repo_pass: 
@@ -36,34 +35,19 @@
           - curl
           - wget
           - tree
-          #- libgtk2.0-0:i386
           - libqt5webkit5
-          #- libwebkit2gtk-4.1-0
+          - libwebkit2gtk-4.1-0
           - vlc
+          - flameshot
           - zabbix-agent2
-          - kazam
+          - solaar
           - obs-studio
+          - qbittorrent
           - wireshark
           - virtualbox
           - tilix
-    - name: Garantindo instalação de pacotes via flatpak
-      flatpak:
-        name: '{{ item }}'
-        state: present
-      loop:
-        - com.google.Chrome
-        - com.brave.Browser
-        - com.getpostman.Postman
-        - com.spotify.Client
-        - com.sublimetext.three
-        - com.visualstudio.code
-        - com.discordapp.Discord
-        - us.zoom.Zoom
-        - md.obsidian.Obsidian
-        - org.qbittorrent.qBittorrent
-        - com.uploadedlobster.peek
-        - io.github.pwr_solaar.solaar
-        - dev.k8slens.OpenLens
+          - kazam
+          - peek
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
@@ -83,20 +67,65 @@
           state: restarted
           enabled: yes
     - block:
-      - name: Garantindo que a chave para o repositório OpenVPN esteja presente
+      - name: Verificando se existe instalador para o GlobalProtect
+        stat:
+          path: '/home/{{ so_user }}/Downloads/globalprotect.deb'
+        register: globalprotect
+      - name: Tentando baixar o GlobalProtect
         get_url:
-          url: https://packages.openvpn.net/packages-repo.gpg
-          dest: /tmp/openvpn.asc
+          url: 'https://{{ repo_url }}/globalprotect.deb'
+          dest: '/home/{{ so_user }}/Downloads/globalprotect.deb'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not globalprotect.stat.exists
+      - name: Garantindo que o GlobalProtect esteja instalado
+        shell: 'dpkg -i /home/{{ so_user }}/Downloads/globalprotect.deb'
+    - block:
+      - name: Garantindo que a chave para o repositório Google esteja presente
+        apt_key: 
+          url: 'https://dl.google.com/linux/linux_signing_key.pub'
+          state: present
+      - name: Garantindo que o repositório do Google esteja presente
+        apt_repository:
+          repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
+          state: present
+          filename: google-chrome
+      - name: Garantindo que o navegador Google Chrome esteja instalado
+        apt:
+          name: google-chrome-stable
+    - block:
+      - name: Garantindo que a chave para o repositório Brave esteja presente
+        get_url:
+          url: https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+          dest: /usr/share/keyrings/brave-browser-archive-keyring.gpg
           mode: 0644
-      - name: Importando o OpenVPN archive keyring
+      - name: Importando o Brave archive keyring
         apt_key:
-          file: /tmp/openvpn.asc
+          file: /usr/share/keyrings/brave-browser-archive-keyring.gpg
           state: present
       - name: Garantindo que o repositório do Brave esteja presente
         apt_repository:
-          repo: 'deb [signed-by=/tmp/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main'
+          repo: 'deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main'
           state: present
-          filename: openvpn-packages.list
+          filename: brave-browser-release
+      - name: Garantindo que o Brave esteja instalado
+        apt:
+          name: brave-browser
+    - block:
+      - name: Garantindo que a chave para o repositório OpenVPN esteja presente
+        get_url:
+          url: https://packages.openvpn.net/packages-repo.gpg
+          dest: /usr/share/keyrings/openvpn.asc
+          mode: 0644
+      - name: Importando o OpenVPN archive keyring
+        apt_key:
+          file: /usr/share/keyrings/openvpn.asc
+          state: present
+      - name: Garantindo que o repositório do OpenVPN esteja presente
+        apt_repository:
+          repo: 'deb [signed-by=/usr/share/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main'
+          state: present
+          filename: openvpn-packages
       - name: Garantindo que o OpenVPN esteja instalado
         apt:
           name: openvpn3
@@ -146,3 +175,17 @@
         shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
         args:
           warn: false
+    - name: Garantindo instalação de pacotes via flatpak
+      flatpak:
+        name: '{{ item }}'
+        state: present
+      loop:
+        - com.getpostman.Postman
+        - com.spotify.Client
+        - com.sublimetext.three
+        - com.visualstudio.code
+        - com.discordapp.Discord
+        - us.zoom.Zoom
+        - md.obsidian.Obsidian
+        - dev.k8slens.OpenLens
+        - com.dropbox.Client
