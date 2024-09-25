@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Ubuntu - v1.4
+- name: Preparando estação de trabalho Ubuntu - v1.5
   hosts: localhost
   connection: local
   become: true
@@ -43,6 +43,7 @@
           - flameshot
           - gdebi
           - zabbix-agent2
+          - default-jre
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
