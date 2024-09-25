@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Ubuntu - v1.6
+- name: Preparando estação de trabalho Ubuntu - v1.7
   hosts: localhost
   connection: local
   become: true
@@ -44,6 +44,43 @@
           - gdebi
           - zabbix-agent2
           - default-jre
+    - block:
+      - name: Tentando baixar o NetExtender
+        ansible.builtin.get_url:
+          url: "https://software.sonicwall.com/NetExtender/NetExtender.Linux-10.2.845.x86_64.tgz"
+          dest: "./netextender.tgz"
+          mode: '0644'
+      - name: Tentando baixar o NetExtender config
+        ansible.builtin.get_url:
+          url: 'https://{{ repo_url }}/.netextender'
+          dest: '/home/{{ so_user }}/.netextender'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+          mode: '0644'
+      - name: Tentando extrair NetExtender tgz
+        ansible.builtin.unarchive:
+          src: "./netextender.tgz"
+          dest: "./"
+          remote_src: yes
+      - name: Modificando 'REPLY=0' to 'REPLY=''' no script de instalação
+        ansible.builtin.replace:
+          path: "./netExtenderClient/install"
+          regexp: "REPLY='0'"
+          replace: "REPLY=''"
+      - name: Modificando 'REPLY=n' to 'REPLY=y' no script de instalação
+        ansible.builtin.replace:
+          path: "./netExtenderClient/install"
+          regexp: "REPLY='n'"
+          replace: "REPLY='y'"
+      - name: Comentando o 'read -p' no script de instalação
+        ansible.builtin.replace:
+          path: "./netExtenderClient/install"
+          regexp: "read -p"
+          replace: "#"
+      - name: Tentando instalar o NetExtender
+        ansible.builtin.command:
+          cmd: "./install"
+          chdir: "./netExtenderClient"
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
