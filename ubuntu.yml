@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Ubuntu - v1.5
+- name: Preparando estação de trabalho Ubuntu - v1.6
   hosts: localhost
   connection: local
   become: true
@@ -162,49 +162,6 @@
           group: '{{ so_user }}'
           mode: '0775'
     - block:
-      - name: Verificando se existe instalador para o GlobalProtect
-        stat:
-          path: '/home/{{ so_user }}/Downloads/globalprotect.deb'
-        register: globalprotect
-      - name: Tentando baixar o GlobalProtect
-        get_url:
-          url: 'https://{{ repo_url }}/globalprotect.deb'
-          dest: '/home/{{ so_user }}/Downloads/globalprotect.deb'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
-        when: not globalprotect.stat.exists
-      - name: Tentando baixar o GlobalProtect pangpa.xml.j2
-        get_url:
-          url: 'https://{{ repo_url }}/pangpa.xml.j2'
-          dest: '/home/{{ so_user }}/Downloads/pangpa.xml.j2'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
-      - name: Garantindo que exista o diretório config do GlobalProtect
-        file:
-          path: '/home/{{ so_user }}/.GlobalProtect'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-          state: directory
-          mode: '0755'
-      - name: Garantindo configuração do GlobalProtect
-        template:
-          src: '/home/{{ so_user }}/Downloads/pangpa.xml.j2'
-          dest: '/home/{{ so_user }}/.GlobalProtect/pangpa.xml'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-          mode: '0660'
-      - name: Garantindo que o GlobalProtect esteja instalado
-        shell: 'dpkg -i /home/{{ so_user }}/Downloads/globalprotect.deb'
-        #apt:
-          #deb: '/home/{{ so_user }}/Downloads/globalprotect.deb'
-      - name: Garantido que exista atalho para o GlobalProtect
-        copy:
-          src: /usr/share/applications/globalprotect.desktop
-          dest: '/home/{{ so_user }}/Área de Trabalho/'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-          mode: '0775'
-    - block:
       - name: Verificando se existe instalador para o Teamviewer
         stat:
           path: '/home/{{ so_user }}/Downloads/teamviewer.deb'
@@ -234,23 +191,6 @@
       - name: Garantindo que o Anydesk esteja instalado
         apt:
           deb: '/home/{{ so_user }}/Downloads/anydesk.deb'
-    - block:
-      - name: Verificando se o RPORT está instalado
-        stat:
-          path: /usr/local/bin/rport
-        register: rport
-      - name: Tentando baixar o RPORT
-        get_url:
-          url: 'https://{{ repo_url }}/rport.sh'
-          dest: '/home/{{ so_user }}/Downloads/rport.sh'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
-        when: not rport.stat.exists
-      - name: Tentando instalar o RPORT
-        shell: 'sh /home/{{ so_user }}/Downloads/rport.sh -x -s -r -b -i'
-        args:
-          warn: false
-        when: not rport.stat.exists
     - block:
       - name: Verificando se o agente do MeshCentral está instalado
         stat:
