@@ -51,7 +51,6 @@
       - name: Verificando se existe instalador para o netextender
         stat:
           path: '/home/{{ so_user }}/Downloads/netextender.tgz'
-        when: not netextender_installed.stat.exists
         register: netextender
       - name: Tentando baixar o NetExtender
         get_url:
@@ -59,26 +58,23 @@
           dest: "/home/{{ so_user }}/Downloads/netextender.tgz"
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
-          mode: '0644'
         when: not netextender.stat.exists
       - name: Tentando baixar o NetExtender config
-        ansible.builtin.get_url:
+        get_url:
           url: 'https://{{ repo_url }}/netextender.conf'
           dest: '/home/{{ so_user }}/.netextender'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
-          mode: '0644'
-        when: not netextender_installed.stat.exists
       - name: Tentando extrair NetExtender tgz
         unarchive:
-          src: "./netextender.tgz"
+          src: '/home/{{ so_user }}/Downloads/netextender.tgz'
           dest: '/home/{{ so_user }}/Downloads/'
           remote_src: yes
         when: not netextender_installed.stat.exists
       - name: Tentando instalar o NetExtender
-        ansible.builtin.command:
-          cmd: "./install"
-          chdir: "./netExtenderClient"
+        command:
+          cmd: './install'
+          chdir: '/home/{{ so_user }}/Downloads/netExtenderClient'
         when: not netextender_installed.stat.exists
     - block:
       - name: Tentando baixar o config do zabbix-agent2
