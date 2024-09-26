@@ -5,8 +5,7 @@
   become: true
   vars:
     so_user: 
-    vpn_user:
-    repo_url:
+    repo_url: 
     repo_user: 
     repo_pass: 
   tasks:
