@@ -51,6 +51,8 @@
           dest: '/home/{{ so_user }}/wallpaper.png'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
       - name: Definindo Wallpaper tema claro
         shell: >
           gsettings set org.gnome.desktop.background picture-uri
@@ -67,15 +69,25 @@
       - name: Tentando baixar o Atalho 3CX
         get_url:
           url: 'https://{{ repo_url }}/3CX.desktop'
-          dest: '/home/{{ so_user }}/.local/share/applications/3CX.desktop'
+          dest: '/home/{{ so_user }}/Área de Trabalho/'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+      - name: Garantindo que exista o diretório icons
+        file:
+          path: '/home/{{ so_user }}/.local/share/icons/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          state: directory
       - name: Tentando baixar o icone 3CX
         get_url:
           url: 'https://{{ repo_url }}/3cx.png'
           dest: '/home/{{ so_user }}/.local/share/icons/3cx.png'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
     - block:
       - name: Verificando se o NetExtender já está instalado
         stat:
