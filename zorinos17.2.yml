@@ -54,9 +54,8 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
       - name: Definindo Wallpaper
-        shell: >
-        su - {{ so_user }} -c 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png"'
-        su - {{ so_user }} -c 'gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/{{ so_user }}/wallpaper.png"'
+        become: false
+        shell: 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png" && gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/{{ so_user }}/wallpaper.png"'
     - block:
       - name: Tentando baixar o Atalho 3CX
         get_url:
