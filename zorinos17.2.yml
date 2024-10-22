@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho ZorinOS 17.2 v1.0
+- name: Preparando estação de trabalho ZorinOS 17.2 v1.1
   hosts: localhost
   connection: local
   become: true
@@ -32,6 +32,7 @@
       loop:
           - vim
           - htop
+          - btop
           - curl
           - wget
           - ncdu
@@ -43,6 +44,24 @@
           - gdebi
           - zabbix-agent2
           - default-jre
+    - name: Tentando baixar o Wallpaper
+      get_url:
+        url: 'https://{{ repo_url }}/wallpaper.png'
+        dest: '/home/{{ so_user }}/wallpaper.png'
+        username: '{{ repo_user }}'
+        password: '{{ repo_pass }}'
+    - name: Definindo Wallpaper tema claro
+      shell: >
+        gsettings set org.gnome.desktop.background picture-uri
+        "file:///home/{{ so_user }}/wallpaper.png"
+      environment:
+        DISPLAY: ":0"
+    - name: Definindo Wallpaper tema escuro
+      shell: >
+        gsettings set org.gnome.desktop.background picture-uri-dark
+        "file:///home/{{ so_user }}/wallpaper.png"
+      environment:
+        DISPLAY: ":0"
     - block:
       - name: Verificando se o NetExtender já está instalado
         stat:
