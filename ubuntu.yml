@@ -44,24 +44,41 @@
           - gdebi
           - zabbix-agent2
           - default-jre
-    - name: Tentando baixar o Wallpaper
-      get_url:
-        url: 'https://{{ repo_url }}/wallpaper.png'
-        dest: '/home/{{ so_user }}/wallpaper.png'
-        username: '{{ repo_user }}'
-        password: '{{ repo_pass }}'
-    - name: Definindo Wallpaper tema claro
-      shell: >
-        gsettings set org.gnome.desktop.background picture-uri
-        "file:///home/{{ so_user }}/wallpaper.png"
-      environment:
-        DISPLAY: ":0"
-    - name: Definindo Wallpaper tema escuro
-      shell: >
-        gsettings set org.gnome.desktop.background picture-uri-dark
-        "file:///home/{{ so_user }}/wallpaper.png"
-      environment:
-        DISPLAY: ":0"
+    - block:
+      - name: Tentando baixar o Wallpaper
+        get_url:
+          url: 'https://{{ repo_url }}/wallpaper.png'
+          dest: '/home/{{ so_user }}/wallpaper.png'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+      - name: Definindo Wallpaper
+        become: false
+        shell: 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png" && gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/{{ so_user }}/wallpaper.png"'
+    - block:
+      - name: Tentando baixar o Atalho 3CX
+        get_url:
+          url: 'https://{{ repo_url }}/3CX.desktop'
+          dest: '/home/{{ so_user }}/Área de Trabalho/'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+      - name: Garantindo que exista o diretório icons
+        file:
+          path: '/home/{{ so_user }}/.local/share/icons/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          state: directory
+      - name: Tentando baixar o icone 3CX
+        get_url:
+          url: 'https://{{ repo_url }}/3cx.png'
+          dest: '/home/{{ so_user }}/.local/share/icons/3cx.png'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
     - block:
       - name: Verificando se o NetExtender já está instalado
         stat:
