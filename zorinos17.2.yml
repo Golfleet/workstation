@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho ZorinOS 17.2 v1.2
+- name: Preparando estação de trabalho ZorinOS 17.2 v1.1
   hosts: localhost
   connection: local
   become: true
@@ -54,17 +54,9 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
       - name: Definindo Wallpaper tema claro
-        shell: >
-          gsettings set org.gnome.desktop.background picture-uri
-          "file:///home/{{ so_user }}/wallpaper.png"
-        environment:
-          DISPLAY: ":0"
+        shell: 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png"'
       - name: Definindo Wallpaper tema escuro
-        shell: >
-          gsettings set org.gnome.desktop.background picture-uri-dark
-          "file:///home/{{ so_user }}/wallpaper.png"
-        environment:
-          DISPLAY: ":0"
+        shell: 'gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/{{ so_user }}/wallpaper.png"'
     - block:
       - name: Tentando baixar o Atalho 3CX
         get_url:
@@ -82,7 +74,7 @@
           state: directory
       - name: Tentando baixar o icone 3CX
         get_url:
-          url: 'https://{{ repo_url }}/3cx.png'
+          url: 'https://{{ repo_url }}/3cx_icon.png'
           dest: '/home/{{ so_user }}/.local/share/icons/3cx.png'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
