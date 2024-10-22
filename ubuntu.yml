@@ -112,13 +112,22 @@
           cmd: './install'
           chdir: '/home/{{ so_user }}/Downloads/netExtenderClient'
         when: not netextender_installed.stat.exists
-      - name: Garantido que exista atalho para o NetExtender
-        copy:
-          src: /usr/share/applications/sonicwall-netextender.desktop
+      - name: Tentando baixar o Atalho NetExtender CLI
+        get_url:
+          url: 'https://{{ repo_url }}/vpn.desktop'
           dest: '/home/{{ so_user }}/Área de Trabalho/'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
-          mode: '0775'
+          mode: '0755'
+      - name: Tentando baixar o script para NetExtender
+        get_url:
+          url: 'https://{{ repo_url }}/vpn-golfleet.sh'
+          dest: '/usr/local/bin/vpn-golfleet.sh'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+          mode: '0755'
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
