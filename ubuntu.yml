@@ -47,10 +47,8 @@
     - block:
       - name: Tentando baixar o Wallpaper
         get_url:
-          url: 'https://{{ repo_url }}/wallpaper.png'
+          url: 'https://{{ repo_url }}/public/wallpaper.png'
           dest: '/home/{{ so_user }}/wallpaper.png'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
       - name: Definindo Wallpaper
@@ -75,8 +73,6 @@
         get_url:
           url: 'https://{{ repo_url }}/public/3CX.png'
           dest: '/home/{{ so_user }}/.local/share/icons/3cx.png'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
     - block:
@@ -245,21 +241,6 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0775'
-    - block:
-      - name: Verificando se existe instalador para o Teamviewer
-        stat:
-          path: '/home/{{ so_user }}/Downloads/teamviewer.deb'
-        register: teamviewer
-      - name: Tentando baixar o Teamviewer
-        get_url:
-          url: 'https://download.teamviewer.com/download/linux/teamviewer_amd64.deb'
-          dest: '/home/{{ so_user }}/Downloads/teamviewer.deb'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
-        when: not teamviewer.stat.exists
-      - name: Garantindo que o Teamviewer esteja instalado
-        apt:
-          deb: '/home/{{ so_user }}/Downloads/teamviewer.deb'
     - block:
       - name: Verificando se existe instalador para o Anydesk
         stat:
