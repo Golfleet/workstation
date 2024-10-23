@@ -44,6 +44,17 @@
           - gdebi
           - zabbix-agent2
           - default-jre
+    - name: Define gdebi como padrão para pacotes instalação de pacotes .deb
+      become: false
+      shell: 'xdg-mime default gdebi.desktop application/vnd.debian.binary-package'
+    - name: Cria atalho tecla Print para flameshot
+      become: false
+      shell: |
+        gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot '[]'
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+        gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'flameshot'
+        gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'flameshot gui'
+        gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding 'Print'
     - block:
       - name: Tentando baixar o Wallpaper
         get_url:
