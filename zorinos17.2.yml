@@ -73,7 +73,7 @@
           state: directory
       - name: Tentando baixar o icone 3CX
         get_url:
-          url: 'https://{{ repo_url }}/3CX.png'
+          url: 'https://{{ repo_url }}/public/3CX.png'
           dest: '/home/{{ so_user }}/.local/share/icons/3cx.png'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
