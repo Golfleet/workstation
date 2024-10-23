@@ -226,10 +226,8 @@
         register: discord
       - name: Tentando baixar o Discord
         get_url:
-          url: 'https://{{ repo_url }}/discord.deb'
+          url: 'https://{{ repo_url }}/public/discord.deb'
           dest: '/home/{{ so_user }}/Downloads/discord.deb'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
         when: not discord.stat.exists
       - name: Garantindo que o Discord esteja instalado
         apt:
@@ -248,10 +246,8 @@
         register: anydesk
       - name: Tentando baixar o Anydesk
         get_url:
-          url: 'https://{{ repo_url }}/anydesk.deb'
+          url: 'https://{{ repo_url }}/public/anydesk.deb'
           dest: '/home/{{ so_user }}/Downloads/anydesk.deb'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
         when: not anydesk.stat.exists
       - name: Garantindo que o Anydesk esteja instalado
         apt:
