@@ -32,7 +32,6 @@
       loop:
           - vim
           - htop
-          - btop
           - curl
           - wget
           - ncdu
@@ -44,6 +43,12 @@
           - gdebi
           - zabbix-agent2
           - default-jre
+    - name: Garantindo instalação de pacotes snap
+      snap:
+        name: '{{ item }}'
+        state: present
+      loop:
+          - btop
     - name: Define gdebi como padrão para pacotes instalação de pacotes .deb
       become: false
       shell: 'xdg-mime default gdebi.desktop application/vnd.debian.binary-package'
@@ -64,7 +69,7 @@
           group: '{{ so_user }}'
       - name: Definindo Wallpaper
         become: false
-        shell: 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png" && gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/{{ so_user }}/wallpaper.png"'
+        shell: 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png"'
     - block:
       - name: Tentando baixar o Atalho 3CX
         get_url:
