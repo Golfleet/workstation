@@ -238,7 +238,7 @@
         register: discord
       - name: Tentando baixar o Discord
         get_url:
-          url: 'https://{{ repo_url }}/public/discord.deb'
+          url: 'https://discord.com/api/download?platform=linux&format=deb'
           dest: '/home/{{ so_user }}/Downloads/discord.deb'
         when: not discord.stat.exists
       - name: Garantindo que o Discord esteja instalado
