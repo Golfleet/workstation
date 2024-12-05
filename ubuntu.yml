@@ -79,6 +79,7 @@
           password: '{{ repo_pass }}'
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
+          mode: '0755'
       - name: Garantindo que exista o diretório icons
         file:
           path: '/home/{{ so_user }}/.local/share/icons/'
