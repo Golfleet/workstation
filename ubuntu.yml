@@ -107,6 +107,9 @@
           dest: "/home/{{ so_user }}/Downloads/netextender.deb"
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
         when: not netextender.stat.exists
       - name: Garantindo que o NetExtender esteja instalado
         apt:
