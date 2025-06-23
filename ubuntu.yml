@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Ubuntu - v1.8
+- name: Preparando estação de trabalho Ubuntu - v1.9
   hosts: localhost
   connection: local
   become: true
@@ -93,10 +93,6 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
     - block:
-      - name: Verificando se o NetExtender já está instalado
-        stat:
-          path: '/usr/local/netExtender'
-        register: netextender_installed
       - name: Verificando se existe instalador para o netextender
         stat:
           path: '/home/{{ so_user }}/Downloads/netextender.deb'
