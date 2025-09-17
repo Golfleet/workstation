@@ -43,6 +43,7 @@
           - gdebi
           - zabbix-agent2
           - default-jre
+          - lm-sensors
     - name: Garantindo instalação de pacotes snap
       snap:
         name: '{{ item }}'
