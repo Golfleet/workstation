@@ -59,12 +59,16 @@
           - com.github.tchx84.Flatseal
       - name: "Concede permissão de acesso a ~/.local/share/applications"
         command:
-          cmd: "flatpak override --user --filesystem=~/.local/share/applications:ro com.google.Chrome"
+          cmd: "flatpak override --user --filesystem=~/.local/share/applications com.google.Chrome"
         changed_when: false
+        become: yes
+        become_user: "{{ so_user }}"
       - name: "Concede permissão de acesso a ~/.local/share/icons"
         command:
-          cmd: "flatpak override --user --filesystem=~/.local/share/icons:ro com.google.Chrome"
+          cmd: "flatpak override --user --filesystem=~/.local/share/icons com.google.Chrome"
         changed_when: false
+        become: yes
+        become_user: "{{ so_user }}"
     - name: Define gdebi como padrão para pacotes instalação de pacotes .deb
       become: false
       shell: 'xdg-mime default gdebi.desktop application/vnd.debian.binary-package'
@@ -140,14 +144,6 @@
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
           force: yes
-      - name: "Ativa a inicialização automática do RustDesk (Flatpak)"
-        copy:
-          src: "/var/lib/flatpak/exports/share/applications/com.rustdesk.RustDesk.desktop"
-          dest: "/home/{{ so_user }}/.config/autostart/com.rustdesk.RustDesk.desktop"
-          remote_src: yes
-          mode: '0644'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
     - block:
       - name: Garantindo configuração de memória swap
         lineinfile:
@@ -165,3 +161,8 @@
         line: 'WaylandEnable=false'
         state: present
         backrefs: yes
+
+    - name: Reboot
+      command:
+        cmd: "reboot"
+      become: yes
