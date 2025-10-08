@@ -81,7 +81,7 @@
       - name: Tentando baixar o Atalho 3CX
         get_url:
           url: 'https://{{ repo_url }}/3CX.desktop'
-          dest: '/home/{{ so_user }}/Área de Trabalho/'
+          dest: '/home/{{ so_user }}/Área de trabalho/'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
           owner: '{{ so_user }}'
