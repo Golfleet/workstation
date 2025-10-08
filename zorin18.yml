@@ -144,6 +144,8 @@
           path: "/home/{{ so_user }}/.var/app/com.rustdesk.RustDesk/config/rustdesk"
           state: directory
           mode: '0755'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
       - name: Tentando baixar arquivo de configuração do RustDesk
         get_url:
           url: 'https://{{ repo_url }}/RustDesk2.toml'
@@ -157,6 +159,8 @@
           dest: "/home/{{ so_user }}/.config/autostart/com.rustdesk.RustDesk.desktop"
           remote_src: yes
           mode: '0644'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
     - block:
       - name: Garantindo configuração de memória swap
         lineinfile:
@@ -166,3 +170,12 @@
     - block:
       - name: Garantindo permissão de su para o usuário corrente
         shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
+    - block:
+      - name: "Concede permissão de acesso a ~/.local/share/applications"
+        command:
+          cmd: "flatpak override --user --filesystem=~/.local/share/applications:ro com.google.Chrome"
+        changed_when: false
+      - name: "Concede permissão de acesso a ~/.local/share/icons"
+        command:
+          cmd: "flatpak override --user --filesystem=~/.local/share/icons:ro com.google.Chrome"
+        changed_when: false
