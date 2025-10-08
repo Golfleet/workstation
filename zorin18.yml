@@ -1,0 +1,167 @@
+---
+- name: Preparando estação de trabalho Zorin 18 - v1.0
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+    so_user: 
+    repo_url: 
+    repo_user: 
+    repo_pass: 
+  tasks:
+    - block:
+      - name: Verificando se existe instalador para o repositório do zabbix-agent2
+        stat:
+          path: '/home/{{ so_user }}/Downloads/zabbix-agent2.deb'
+        register: zabbixagent2
+      - name: Tentando baixar o instalador de repositório do zabbix-agent2 
+        get_url:
+          url: 'https://repo.zabbix.com/zabbix/6.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu24.04_all.deb'
+          dest: '/home/{{ so_user }}/Downloads/zabbix-agent2.deb'
+        when: not zabbixagent2.stat.exists
+      - name: Garantindo que o repositório do zabbix-agent2 esteja instalado
+        shell: 'dpkg -i /home/{{ so_user }}/Downloads/zabbix-agent2.deb'
+      - name: Atualizando repositórios
+        apt:
+          update_cache: yes
+    - name: Garantindo instalação de pacotes básicos do linux
+      package:
+        name: '{{ item }}'
+        install_recommends: yes
+        state: present
+      loop:
+          - vim
+          - htop
+          - curl
+          - wget
+          - ncdu
+          - tree
+          - libgtk2.0-0:i386
+          - libqt5webkit5
+          - flameshot
+          - gdebi
+          - zabbix-agent2
+          - default-jre
+          - lm-sensors
+          - btop
+    - name: Garantindo instalação de pacotes via flatpak
+      flatpak:
+        name: '{{ item }}'
+        state: present
+      loop:
+        - com.discordapp.Discord
+        - us.zoom.Zoom
+        - org.videolan.VLC
+        - com.google.Chrome
+        - com.anydesk.Anydesk
+        - com.rustdesk.RustDesk
+        - com.github.tchx84.Flatseal
+    - name: Define gdebi como padrão para pacotes instalação de pacotes .deb
+      become: false
+      shell: 'xdg-mime default gdebi.desktop application/vnd.debian.binary-package'
+    - name: Cria atalho tecla Print para flameshot
+      become: false
+      shell: |
+        gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot '[]'
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+        gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'flameshot'
+        gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'flameshot gui'
+        gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding 'Print'
+    - block:
+      - name: Tentando baixar o Wallpaper
+        get_url:
+          url: 'https://{{ repo_url }}/public/wallpaper.png'
+          dest: '/home/{{ so_user }}/wallpaper.png'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+      - name: Definindo Wallpaper
+        become: false
+        shell: 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png"'
+    - block:
+      - name: Tentando baixar o Atalho 3CX
+        get_url:
+          url: 'https://{{ repo_url }}/3CX.desktop'
+          dest: '/home/{{ so_user }}/Área de Trabalho/'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0755'
+      - name: Garantindo que exista o diretório icons
+        file:
+          path: '/home/{{ so_user }}/.local/share/icons/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          state: directory
+      - name: Tentando baixar o icone 3CX
+        get_url:
+          url: 'https://{{ repo_url }}/public/3CX.png'
+          dest: '/home/{{ so_user }}/.local/share/icons/3cx.png'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+    - block:
+      - name: Tentando baixar o config do zabbix-agent2
+        get_url:
+          url: 'https://{{ repo_url }}/zabbix/zabbix_agent2.conf'
+          dest: '/etc/zabbix/zabbix_agent2.conf'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+      - name: Tentando baixar o key.psk do zabbix-agent2
+        get_url:
+          url: 'https://{{ repo_url }}/zabbix/key.psk'
+          dest: '/etc/zabbix/key.psk'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+      - name: Reiniciando e habilitando o serviço do zabbix-agent2
+        service:
+          name: zabbix-agent2
+          state: restarted
+          enabled: yes
+    - block:
+      - name: Verificando se o agente do MeshCentral está instalado
+        stat:
+          path: /usr/local/mesh_services/meshagent
+        register: meshcentral
+      - name: Tentando baixar o agente do MeshCentral
+        get_url:
+          url: 'https://{{ repo_url }}/meshinstall.sh'
+          dest: '/home/{{ so_user }}/Downloads/meshinstall.sh'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+        when: not meshcentral.stat.exists
+      - name: Garantindo que o meshinstall.sh possa ser executado
+        file:
+          path: '/home/{{ so_user }}/Downloads/meshinstall.sh'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0755'
+      - name: Tentando instalar o agente do MeshCentral
+        shell: 'sudo -E /home/{{ so_user }}/Downloads/meshinstall.sh install'
+        args:
+          warn: false
+        when: not meshcentral.stat.exists
+    - block:
+      - name: Tentando baixar arquivo de configuração do RustDesk
+        get_url:
+          url: 'https://{{ repo_url }}/RustDesk2.toml'
+          dest: '/home/{{ so_user }}/.var/app/com.rustdesk.RustDesk/config/rustdesk/RustDesk2.toml'
+          username: '{{ repo_user }}'
+          password: '{{ repo_pass }}'
+          force: yes
+      - name: "Ativa a inicialização automática do RustDesk (Flatpak)"
+        copy:
+          src: "/var/lib/flatpak/exports/share/applications/com.rustdesk.RustDesk.desktop"
+          dest: "/home/{{ so_user }}/.config/autostart/com.rustdesk.RustDesk.desktop"
+          remote_src: yes
+          mode: '0644'
+    - block:
+      - name: Garantindo configuração de memória swap
+        lineinfile:
+          path: /etc/sysctl.conf
+          line: "vm.swappiness = 0"
+          state: present
+    - block:
+      - name: Garantindo permissão de su para o usuário corrente
+        shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
+        args:
+          warn: false

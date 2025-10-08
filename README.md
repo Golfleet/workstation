@@ -14,7 +14,7 @@ sudo apt update && sudo apt install ansible unzip git -y
 ```
 2. Clone esse repositório
 ```bash
-git clone https://github.com/asf-git/workstation.git
+git clone https://github.com/Golfleet/workstation.git
 ```
 
 3. Execute o script ansible
