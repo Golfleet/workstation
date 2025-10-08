@@ -44,18 +44,27 @@
           - default-jre
           - lm-sensors
           - btop
-    - name: Garantindo instalação de pacotes via flatpak
-      flatpak:
-        name: '{{ item }}'
-        state: present
-      loop:
-        - com.discordapp.Discord
-        - us.zoom.Zoom
-        - org.videolan.VLC
-        - com.google.Chrome
-        - com.anydesk.Anydesk
-        - com.rustdesk.RustDesk
-        - com.github.tchx84.Flatseal
+    - block:
+      - name: Garantindo instalação de pacotes via flatpak
+        flatpak:
+          name: '{{ item }}'
+          state: present
+        loop:
+          - com.discordapp.Discord
+          - us.zoom.Zoom
+          - org.videolan.VLC
+          - com.google.Chrome
+          - com.anydesk.Anydesk
+          - com.rustdesk.RustDesk
+          - com.github.tchx84.Flatseal
+      - name: "Concede permissão de acesso a ~/.local/share/applications"
+        command:
+          cmd: "flatpak override --user --filesystem=~/.local/share/applications:ro com.google.Chrome"
+        changed_when: false
+      - name: "Concede permissão de acesso a ~/.local/share/icons"
+        command:
+          cmd: "flatpak override --user --filesystem=~/.local/share/icons:ro com.google.Chrome"
+        changed_when: false
     - name: Define gdebi como padrão para pacotes instalação de pacotes .deb
       become: false
       shell: 'xdg-mime default gdebi.desktop application/vnd.debian.binary-package'
@@ -170,12 +179,3 @@
     - block:
       - name: Garantindo permissão de su para o usuário corrente
         shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
-    - block:
-      - name: "Concede permissão de acesso a ~/.local/share/applications"
-        command:
-          cmd: "flatpak override --user --filesystem=~/.local/share/applications:ro com.google.Chrome"
-        changed_when: false
-      - name: "Concede permissão de acesso a ~/.local/share/icons"
-        command:
-          cmd: "flatpak override --user --filesystem=~/.local/share/icons:ro com.google.Chrome"
-        changed_when: false
