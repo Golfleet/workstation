@@ -87,28 +87,6 @@
         become: false
         shell: 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png"'
     - block:
-      - name: Tentando baixar o Atalho 3CX
-        get_url:
-          url: 'https://{{ repo_url }}/3CX.desktop'
-          dest: '/home/{{ so_user }}/Área de trabalho/'
-          username: '{{ repo_user }}'
-          password: '{{ repo_pass }}'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-          mode: '0755'
-      - name: Garantindo que exista o diretório icons
-        file:
-          path: '/home/{{ so_user }}/.local/share/icons/'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-          state: directory
-      - name: Tentando baixar o icone 3CX
-        get_url:
-          url: 'https://{{ repo_url }}/public/3CX.png'
-          dest: '/home/{{ so_user }}/.local/share/icons/3cx.png'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-    - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
           url: 'https://{{ repo_url }}/zabbix/zabbix_agent2.conf'
@@ -179,3 +157,11 @@
     - block:
       - name: Garantindo permissão de su para o usuário corrente
         shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
+
+    - name: Garantir que 'WaylandEnable=false' esteja descomentado em /etc/gdm3/custom.conf
+      lineinfile:
+        path: /etc/gdm3/custom.conf
+        regexp: '^#\s*WaylandEnable=false'
+        line: 'WaylandEnable=false'
+        state: present
+        backrefs: yes
