@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Zorin 18 - v1.0
+- name: Preparando estação de trabalho Zorin 18 - v1.1
   hosts: localhost
   connection: local
   become: true
@@ -137,10 +137,13 @@
           mode: '0755'
       - name: Tentando instalar o agente do MeshCentral
         shell: 'sudo -E /home/{{ so_user }}/Downloads/meshinstall.sh install'
-        args:
-          warn: false
         when: not meshcentral.stat.exists
     - block:
+      - name: "Garante que o diretório de rustdesk para o usuário '{{ so_user }}' exista"
+        file:
+          path: "/home/{{ so_user }}/.var/app/com.rustdesk.RustDesk/config/rustdesk"
+          state: directory
+          mode: '0755'
       - name: Tentando baixar arquivo de configuração do RustDesk
         get_url:
           url: 'https://{{ repo_url }}/RustDesk2.toml'
@@ -163,5 +166,3 @@
     - block:
       - name: Garantindo permissão de su para o usuário corrente
         shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
-        args:
-          warn: false
