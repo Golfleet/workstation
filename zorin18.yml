@@ -57,15 +57,9 @@
           - com.anydesk.Anydesk
           - com.rustdesk.RustDesk
           - com.github.tchx84.Flatseal
-      - name: "Concede permissão de acesso a ~/.local/share/applications"
+      - name: "Concede permissão de acesso a ~/.local/share ao Google Chrome"
         command:
-          cmd: "flatpak override --user --filesystem=~/.local/share/applications com.google.Chrome"
-        changed_when: false
-        become: yes
-        become_user: "{{ so_user }}"
-      - name: "Concede permissão de acesso a ~/.local/share/icons"
-        command:
-          cmd: "flatpak override --user --filesystem=~/.local/share/icons com.google.Chrome"
+          cmd: "flatpak override --user --filesystem=~/.local/share com.google.Chrome"
         changed_when: false
         become: yes
         become_user: "{{ so_user }}"
