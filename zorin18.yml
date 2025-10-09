@@ -9,6 +9,12 @@
     repo_user: 
     repo_pass: 
   tasks:
+    - name: "Atualizar o cache do apt e todos os pacotes para a última versão"
+      apt:
+        update_cache: yes
+        upgrade: dist
+        autoremove: yes
+        autoclean: yes
     - block:
       - name: Verificando se existe instalador para o repositório do zabbix-agent2
         stat:
