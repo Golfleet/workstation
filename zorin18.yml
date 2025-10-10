@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Zorin 18 - v1.1
+- name: Preparando estação de trabalho Zorin 18 - v1.2
   hosts: localhost
   connection: local
   become: true
@@ -75,6 +75,7 @@
     - name: Cria atalho tecla Print para flameshot
       become: false
       shell: |
+        gsettings set org.gnome.shell.keybindings show-screenshot-ui "['']"
         gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot '[]'
         gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
         gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'flameshot'
@@ -89,7 +90,9 @@
           group: '{{ so_user }}'
       - name: Definindo Wallpaper
         become: false
-        shell: 'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png"'
+        shell: |
+          'gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png"'
+          'gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/{{ so_user }}/wallpaper.png"'
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
