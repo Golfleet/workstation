@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Zorin 18 - v1.2
+- name: Preparando estação de trabalho Zorin 18 - v1.3
   hosts: localhost
   connection: local
   become: true
@@ -63,6 +63,7 @@
           - com.anydesk.Anydesk
           - com.rustdesk.RustDesk
           - com.github.tchx84.Flatseal
+          - org.kde.okular
       - name: "Concede permissão de acesso a ~/.local/share ao Google Chrome"
         command:
           cmd: "flatpak override --user --filesystem=~/.local/share com.google.Chrome"
