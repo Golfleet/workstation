@@ -51,6 +51,26 @@
           - lm-sensors
           - btop
     - block:
+      - name: Garantindo que a chave para o repositório Google esteja presente
+        apt_key: 
+          url: 'https://dl.google.com/linux/linux_signing_key.pub'
+          state: present
+      - name: Garantindo que o repositório do Google esteja presente
+        apt_repository:
+          repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
+          state: present
+          filename: google-chrome
+      - name: Garantindo que o navegador Google Chrome esteja instalado
+        apt:
+          name: google-chrome-stable
+      - name: Garantido que exista atalho para o Google Chrome
+        copy:
+          src: /usr/share/applications/google-chrome.desktop
+          dest: '/home/{{ so_user }}/Área de trabalho/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
+    - block:
       - name: Garantindo instalação de pacotes via flatpak
         flatpak:
           name: '{{ item }}'
@@ -59,7 +79,6 @@
           - com.discordapp.Discord
           - us.zoom.Zoom
           - org.videolan.VLC
-          - com.google.Chrome
           - com.anydesk.Anydesk
           - com.rustdesk.RustDesk
           - com.github.tchx84.Flatseal
