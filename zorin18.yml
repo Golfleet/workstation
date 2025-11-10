@@ -50,6 +50,7 @@
           - default-jre
           - lm-sensors
           - btop
+          - snapd
     - block:
       - name: Garantindo que a chave para o repositório Google esteja presente
         apt_key: 
@@ -71,12 +72,18 @@
           group: '{{ so_user }}'
           mode: '0775'
     - block:
+      - name: Garantindo instalação de pacotes via snap
+        snap:
+          name: '{{ item }}'
+          state: present
+        loop:
+          - discord
+    - block:
       - name: Garantindo instalação de pacotes via flatpak
         flatpak:
           name: '{{ item }}'
           state: present
         loop:
-          - com.discordapp.Discord
           - us.zoom.Zoom
           - org.videolan.VLC
           - com.anydesk.Anydesk
