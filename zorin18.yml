@@ -192,24 +192,7 @@
         state: present
         backrefs: yes
 
-    - name: Garantir que o histórico não seja gravado na saída
-      command:
-        cmd: "history -c && history -w"
-      changed_when: false
-      become: yes
-      become_user: "{{ so_user }}"
-
-
-    - name: Remover rastros do Ansible
-      file:
-        path: "{{ item }}"
-        state: absent
-      with_items:
-        - "/home/{{ so_user }}/workstation"
-        - "/home/{{ so_user }}/Downloads/workstation"
-      become: yes
-
-    - name: Reboot
-      command:
-        cmd: "reboot"
-      become: yes
+#    - name: Reboot
+#      command:
+#        cmd: "reboot"
+#      become: yes
