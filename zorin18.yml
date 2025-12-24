@@ -1,5 +1,5 @@
 ---
-- name: Preparando estação de trabalho Zorin 18 - v1.3
+- name: Preparando estação de trabalho Zorin 18 - v1.4
   hosts: localhost
   connection: local
   become: true
@@ -191,6 +191,22 @@
         line: 'WaylandEnable=false'
         state: present
         backrefs: yes
+
+    - name: Limpar histórico do Bash
+      file:
+        path: "~/.bash_history"
+        state: absent
+
+    - name: Garantir que o histórico não seja gravado na saída
+      shell: history -c && history -w
+
+    - name: Remover rastros do Ansible
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "~/workstation"
+      become: yes
 
     - name: Reboot
       command:
