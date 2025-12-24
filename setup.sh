@@ -61,18 +61,7 @@ echo -e "\nIniciando execução do Ansible...\n"
 ansible-playbook "$PATH_PLAYBOOK" -K -e "so_user=$SO_USER repo_url=$REPO_URL repo_user=$REPO_USER repo_pass=$REPO_PASS"
 
 # 6. Limpar histórico de forma profunda
-echo "Limpando vestígios do histórico..."
-
-# Limpa o arquivo físico de histórico do usuário atual
-cat /dev/null > ~/.bash_history
-
-# Se o script for rodado como sudo, limpa também o do root
-if [ "$EUID" -eq 0 ]; then
-    cat /dev/null > /root/.bash_history
-fi
-
-# Limpa o histórico da sessão atual na memória
-history -c
+history -c && history -w
 
 # 7. Excluir o diretório (incluindo o shell script e o playbook)
 echo -e "\nLimpando arquivos temporários e diretório..."
