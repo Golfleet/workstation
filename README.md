@@ -19,9 +19,13 @@ sudo apt update && sudo apt install ansible unzip git -y
 git clone https://github.com/Golfleet/workstation.git
 ```
 
-3. Preencha as variáveis no playbook Ansible que será utilizado 
+3. Dê permissão de executação e execute o scritp de setup
 ```bash
-nano workstation/zorin18.yml
+chmod 755 workstation/setup.sh && workstation/setup.sh
+```
+
+4. Siga as instruções do script preenchendo informações necessárias
+```bash
 #  vars:
 #    so_user: 
 #    repo_url: 
@@ -29,10 +33,6 @@ nano workstation/zorin18.yml
 #    repo_pass: 
 ```
 
-4. Execute o playbook Ansible
-```bash
-ansible-playbook workstation/zorin18.yml -K
-```
+5. Na execução do playbook Ansible forneça a senha do root
 > Digite sua senha quando for solicitado, alguns processos exigem acesso root.
 ___
-
