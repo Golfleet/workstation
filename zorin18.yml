@@ -67,8 +67,7 @@
         command:
           cmd: "flatpak override --user --filesystem=~/.local/share com.google.Chrome"
         changed_when: false
-        become: yes
-        become_user: "{{ so_user }}"
+        become: false
     - block:
       - name: Baixando a versão mais atual do Discord
         get_url:
