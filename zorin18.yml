@@ -50,34 +50,6 @@
           - default-jre
           - lm-sensors
           - btop
-          - snapd
-    - block:
-      - name: Garantindo que a chave para o repositório Google esteja presente
-        apt_key: 
-          url: 'https://dl.google.com/linux/linux_signing_key.pub'
-          state: present
-      - name: Garantindo que o repositório do Google esteja presente
-        apt_repository:
-          repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
-          state: present
-          filename: google-chrome
-      - name: Garantindo que o navegador Google Chrome esteja instalado
-        apt:
-          name: google-chrome-stable
-      - name: Garantido que exista atalho para o Google Chrome
-        copy:
-          src: /usr/share/applications/google-chrome.desktop
-          dest: '/home/{{ so_user }}/Área de trabalho/'
-          owner: '{{ so_user }}'
-          group: '{{ so_user }}'
-          mode: '0775'
-    - block:
-      - name: Garantindo instalação de pacotes via snap
-        snap:
-          name: '{{ item }}'
-          state: present
-        loop:
-          - discord
     - block:
       - name: Garantindo instalação de pacotes via flatpak
         flatpak:
@@ -86,6 +58,7 @@
         loop:
           - us.zoom.Zoom
           - org.videolan.VLC
+          - com.google.Chrome
           - com.anydesk.Anydesk
           - com.rustdesk.RustDesk
           - com.github.tchx84.Flatseal
@@ -96,6 +69,22 @@
         changed_when: false
         become: yes
         become_user: "{{ so_user }}"
+    - block:
+      - name: Baixando a versão mais atual do Discord
+        get_url:
+          url: 'https://discord.com/api/download?platform=linux&format=deb'
+          dest: '/home/{{ so_user }}/Downloads/discord.deb'
+          force: yes
+      - name: Garantindo que o Discord esteja instalado
+        apt:
+          deb: '/home/{{ so_user }}/Downloads/discord.deb'
+      - name: Garantido que exista atalho para o Discord
+        copy:
+          src: /usr/share/applications/discord.desktop
+          dest: '/home/{{ so_user }}/Área de trabalho/'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
     - name: Define gdebi como padrão para pacotes instalação de pacotes .deb
       become: false
       shell: 'xdg-mime default gdebi.desktop application/vnd.debian.binary-package'
@@ -192,7 +181,7 @@
         state: present
         backrefs: yes
 
-#    - name: Reboot
-#      command:
-#        cmd: "reboot"
-#      become: yes
+    - name: Reboot
+      command:
+        cmd: "reboot"
+      become: yes
