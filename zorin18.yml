@@ -76,6 +76,19 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0775'
+      - name: Garante que o diretório de ícones exista
+        file:
+          path: "/home/{{ so_user }}/.local/share/icons"
+          state: directory
+          mode: '0755'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+      - name: Baixando ícone do 3CX
+        get_url:
+          url: 'https://golfleet.my3cx.com.br/assets/manifest/icon_192x192.png'
+          dest: '/home/{{ so_user }}/.local/share/icons/3cx.png'
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
       - name: Criar atalho na Área de trabalho para o 3CX (PWA)
         copy:
           dest: '/home/{{ so_user }}/Área de trabalho/3CX.desktop'
@@ -85,10 +98,28 @@
             Name=3CX
             Comment=Acessar o Web Client do 3CX
             Exec=flatpak run com.google.Chrome --app=https://golfleet.my3cx.com.br
-            Icon=com.google.Chrome
+            Icon=/home/{{ so_user }}/.local/share/icons/3cx.png
             Terminal=false
             Type=Application
             Categories=Network;WebBrowser;
+            StartupWMClass=golfleet.my3cx.com.br
+          owner: '{{ so_user }}'
+          group: '{{ so_user }}'
+          mode: '0775'
+      - name: Criar atalho no menu de aplicativos para o 3CX (PWA)
+        copy:
+          dest: '/home/{{ so_user }}/.local/share/applications/3CX.desktop'
+          content: |
+            [Desktop Entry]
+            Version=1.0
+            Name=3CX
+            Comment=Acessar o Web Client do 3CX
+            Exec=flatpak run com.google.Chrome --app=https://golfleet.my3cx.com.br
+            Icon=/home/{{ so_user }}/.local/share/icons/3cx.png
+            Terminal=false
+            Type=Application
+            Categories=Network;WebBrowser;
+            StartupWMClass=golfleet.my3cx.com.br
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0775'
