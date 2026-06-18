@@ -97,12 +97,12 @@
             Version=1.0
             Name=3CX
             Comment=Acessar o Web Client do 3CX
-            Exec=flatpak run com.google.Chrome --app=https://golfleet.my3cx.com.br
+            Exec=flatpak run com.google.Chrome --class=my3cx --app=https://golfleet.my3cx.com.br
             Icon=/home/{{ so_user }}/.local/share/icons/3cx.png
             Terminal=false
             Type=Application
             Categories=Network;WebBrowser;
-            StartupWMClass=golfleet.my3cx.com.br
+            StartupWMClass=my3cx
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0775'
@@ -114,12 +114,12 @@
             Version=1.0
             Name=3CX
             Comment=Acessar o Web Client do 3CX
-            Exec=flatpak run com.google.Chrome --app=https://golfleet.my3cx.com.br
+            Exec=flatpak run com.google.Chrome --class=my3cx --app=https://golfleet.my3cx.com.br
             Icon=/home/{{ so_user }}/.local/share/icons/3cx.png
             Terminal=false
             Type=Application
             Categories=Network;WebBrowser;
-            StartupWMClass=golfleet.my3cx.com.br
+            StartupWMClass=my3cx
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0775'
