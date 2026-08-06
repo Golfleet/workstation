@@ -189,6 +189,13 @@
         state: present
         backrefs: yes
 
+    - name: Configura bloqueio de tela automático por inatividade (5 minutos)
+        become: false
+        shell: |
+          gsettings set org.gnome.desktop.session idle-delay 300
+          gsettings set org.gnome.desktop.screensaver lock-enabled true
+          gsettings set org.gnome.desktop.screensaver lock-delay 0
+
     - name: Reboot
       command:
         cmd: "reboot"
