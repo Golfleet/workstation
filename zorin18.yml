@@ -121,7 +121,7 @@
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
           url: 'https://{{ repo_url }}/zabbix/linux_zabbix_agent2.conf'
-          dest: '/etc/zabbix/zabbix_agent2.conf'
+          dest: '/etc/zabbix/linux_zabbix_agent2.conf'
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
       - name: Tentando baixar o key.psk do zabbix-agent2
