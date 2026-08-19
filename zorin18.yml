@@ -96,6 +96,11 @@
     - name: Define gdebi como padrão para pacotes instalação de pacotes .deb
       become: false
       shell: 'xdg-mime default gdebi.desktop application/vnd.debian.binary-package'
+    - name: Definir o Google Chrome como aplicativo padrao para e-mail (mailto)
+      ansible.builtin.command: xdg-settings set default-url-scheme-handler mailto google-chrome.desktop
+      become: yes
+      become_user: "{{ so_user }}"
+      changed_when: false
     - name: Cria atalho tecla Print para flameshot
       become: false
       shell: |
