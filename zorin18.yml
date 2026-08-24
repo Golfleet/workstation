@@ -77,8 +77,8 @@
           group: '{{ so_user }}'
           mode: '0775'
       - name: Definir o Google Chrome como aplicativo padrao para e-mail (mailto)
-          become: false
-          shell: 'xdg-mime default com.google.Chrome.desktop x-scheme-handler/mailto'
+        become: false
+        shell: 'xdg-mime default com.google.Chrome.desktop x-scheme-handler/mailto'
 
 
     - block:
