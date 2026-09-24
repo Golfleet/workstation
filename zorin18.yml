@@ -15,6 +15,7 @@
         upgrade: dist
         autoremove: yes
         autoclean: yes
+
     - block:
       - name: Verificando se existe instalador para o repositório do zabbix-agent2
         stat:
@@ -30,6 +31,7 @@
       - name: Atualizando repositórios
         apt:
           update_cache: yes
+
     - name: Garantindo instalação de pacotes básicos do linux
       package:
         name: '{{ item }}'
@@ -50,6 +52,7 @@
           - default-jre
           - lm-sensors
           - btop
+
     - block:
       - name: Garantindo instalação de pacotes via flatpak
         flatpak:
@@ -58,28 +61,31 @@
         loop:
           - us.zoom.Zoom
           - org.videolan.VLC
-          - com.google.Chrome
           - com.anydesk.Anydesk
           - com.rustdesk.RustDesk
           - com.github.tchx84.Flatseal
           - org.kde.okular
           - com.rtosta.zapzap
-      - name: "Concede permissão de acesso a ~/.local/share ao Google Chrome"
-        command:
-          cmd: "flatpak override --user --filesystem=~/.local/share com.google.Chrome"
-        changed_when: false
-        become: false
+
+    - block:
+      - name: Baixando o instalador do Google Chrome (.deb)
+        get_url:
+          url: 'https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
+          dest: '/home/{{ so_user }}/Downloads/google-chrome.deb'
+          force: yes
+      - name: Garantindo que o Google Chrome esteja instalado
+        apt:
+          deb: '/home/{{ so_user }}/Downloads/google-chrome.deb'
       - name: Garantindo que exista atalho para o Chrome
         copy:
-          src: /var/lib/flatpak/exports/share/applications/com.google.Chrome.desktop
+          src: /usr/share/applications/google-chrome.desktop
           dest: '/home/{{ so_user }}/Área de trabalho/'
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0775'
       - name: Definir o Google Chrome como aplicativo padrao para e-mail (mailto)
         become: false
-        shell: 'xdg-mime default com.google.Chrome.desktop x-scheme-handler/mailto'
-
+        shell: 'xdg-mime default google-chrome.desktop x-scheme-handler/mailto'
 
     - block:
       - name: Baixando a versão mais atual do Discord
@@ -97,9 +103,11 @@
           owner: '{{ so_user }}'
           group: '{{ so_user }}'
           mode: '0775'
+
     - name: Define gdebi como padrão para pacotes instalação de pacotes .deb
       become: false
       shell: 'xdg-mime default gdebi.desktop application/vnd.debian.binary-package'
+
     - name: Cria atalho tecla Print para flameshot
       become: false
       shell: |
@@ -109,6 +117,7 @@
         gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'flameshot'
         gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'flameshot gui'
         gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding 'Print'
+
     - block:
       - name: Tentando baixar o Wallpaper
         get_url:
@@ -121,6 +130,7 @@
         shell: |
           gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ so_user }}/wallpaper.png"
           gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/{{ so_user }}/wallpaper.png"
+
     - block:
       - name: Tentando baixar o config do zabbix-agent2
         get_url:
@@ -139,6 +149,7 @@
           name: zabbix-agent2
           state: restarted
           enabled: yes
+
     - block:
       - name: Verificando se o agente do MeshCentral está instalado
         stat:
@@ -160,6 +171,7 @@
       - name: Tentando instalar o agente do MeshCentral
         shell: 'sudo -E /home/{{ so_user }}/Downloads/meshinstall.sh install'
         when: not meshcentral.stat.exists
+
     - block:
       - name: "Garante que o diretório de rustdesk para o usuário '{{ so_user }}' exista"
         file:
@@ -175,12 +187,14 @@
           username: '{{ repo_user }}'
           password: '{{ repo_pass }}'
           force: yes
+
     - block:
       - name: Garantindo configuração de memória swap
         lineinfile:
           path: /etc/sysctl.conf
           line: "vm.swappiness = 0"
           state: present
+
     - block:
       - name: Garantindo permissão de su para o usuário corrente
         shell: 'echo "{{ so_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ so_user }} && chmod 440 /etc/sudoers.d/{{ so_user }}'
@@ -199,6 +213,19 @@
         gsettings set org.gnome.desktop.session idle-delay 300
         gsettings set org.gnome.desktop.screensaver lock-enabled true
         gsettings set org.gnome.desktop.screensaver lock-delay 0
+
+    - block:
+      - name: Criando arquivo para bloqueio de armazenamento USB
+        copy:
+          dest: /etc/modprobe.d/disable-usb-storage.conf
+          content: |
+            install usb-storage /bin/false
+            install uas /bin/false
+          owner: root
+          group: root
+          mode: '0644'
+      - name: Atualizando a imagem de boot (initramfs) para aplicar bloqueio USB
+        command: update-initramfs -u
 
     - name: Reboot
       command:
